@@ -49,3 +49,42 @@ A rendszer nemcsak értékeli a választ, hanem meg is magyarázza, miért helye
 Fontos fejlesztési elv
 
 A mesterséges intelligencia által generált feladatok szakmailag ellenőrzött közlekedési szabályokra épüljenek. A gyermekek biztonsága minden esetben elsődleges.
+
+
+A feladatgenerálás két forrása
+
+1. Ellenőrzött kérdésbank
+
+A rendszer szakmailag ellenőrzött közlekedési kérdéseket, helyes válaszokat és magyarázatokat tárol.
+
+Gyalogos közlekedés
+
+Kerékpáros közlekedés
+
+Rollerrel közlekedés
+
+Közlekedési jelzések és szabályok
+
+Veszélyhelyzetek felismerése
+
+2. Mesterséges intelligencia által generált feladatok
+
+A mesterséges intelligencia új, változatos közlekedési helyzeteket és kérdéseket készít.
+
+Új történetek és közlekedési szituációk
+
+Változatos válaszlehetőségek
+
+Életkorhoz igazított nehézség
+
+Személyre szabott gyakorlás
+
+Korábbi hibák alapján új feladatok
+
+3. Biztonsági és szakmai ellenőrzés
+
+Az AI által készített feladatok csak ellenőrzött közlekedési szabályokra épülhetnek. A helyes válaszokat és a magyarázatokat szakmai szempontból ellenőrizni kell, mielőtt a gyermek megkapja őket.
+
+4. A két rendszer együttműködése
+
+A kérdésbank biztosítja a megbízható tudásanyagot, a mesterséges intelligencia pedig gondoskodik a változatosságról és az egyéni gyakorlásról.
