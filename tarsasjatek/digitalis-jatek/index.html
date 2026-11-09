@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rajtad áll a jövőd! – Közlekedési kaland</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #dff5ff, #e8f8df);
+  color: #203040;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 760px;
+  margin: 25px auto;
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 8px 30px #0002;
+}
+h1 { text-align: center; color: #146c43; }
+.subtitle { text-align: center; font-size: 18px; }
+.road { text-align: center; font-size: 55px; margin: 15px; }
+button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin: 12px 0;
+  border: 0;
+  border-radius: 13px;
+  background: #e8f2ff;
+  color: #183b60;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:hover { background: #cce4ff; }
+.mode { background: #dff5e5; }
+.primary { background: #16834a; color: white; }
+.primary:hover { background: #106638; }
+#feedback {
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.correct { background: #d9f7df; }
+.wrong { background: #ffe2df; }
+.info {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin: 15px 0;
+}
+.hidden { display: none; }
+.question { font-size: 23px; line-height: 1.4; }
+.small { text-align: center; color: #667; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🚦 Rajtad áll a jövőd!</h1>
+  <p class="subtitle">Közlekedési kaland 6–12 éveseknek</p>
+  <div class="road">🚸 🚲 🛴</div>
+
+  <section id="start">
+    <h2>Válaszd ki, hogyan közlekedsz!</h2>
+    <button class="mode" onclick="startGame('gyalogos')">🚶 Gyalogos vagyok</button>
+    <button class="mode" onclick="startGame('kerékpáros')">🚲 Kerékpáros vagyok</button>
+    <button class="mode" onclick="startGame('rolleres')">🛴 Rollerrel közlekedem</button>
+    <p class="small">Figyelj, gondolkodj, és gyűjtsd a pontokat!</p>
+  </section>
+
+  <section id="game" class="hidden">
+    <div class="info">
+      <span id="modeLabel"></span>
+      <span>⭐ Pont: <span id="score">0</span></span>
+    </div>
+    <p id="progress"></p>
+    <h2 class="question" id="question"></h2>
+    <div id="answers"></div>
+    <div id="feedback" class="hidden"></div>
+    <button id="next" class="primary hidden" onclick="nextQuestion()">Következő feladat ➜</button>
+  </section>
+
+  <section id="end" class="hidden">
+    <h2>🏆 Ügyes voltál!</h2>
+    <p id="result" class="question"></p>
+    <button class="primary" onclick="location.reload()">Új játék</button>
+  </section>
+</div>
+
+<script>
+const questions = {
+  gyalogos: [
+    {
+      q: "Hol a legbiztonságosabb átkelni az úttesten?",
+      a: ["A kijelölt gyalogátkelőhelyen", "Két parkoló autó között", "Bárhol, ahol éppen kedvem van"],
+      c: 0,
+      e: "A kijelölt gyalogátkelőhely segít abban, hogy a járművezetők számítsanak a gyalogosokra."
+    },
+    {
+      q: "Mit teszel, mielőtt lelépsz a járdáról?",
+      a: ["Azonnal átfutok", "Megállok, körülnézek, és meggyőződöm arról, hogy biztonságos", "Csak a telefonomra figyelek"],
+      c: 1,
+      e: "Mindig meg kell győződni arról, hogy biztonságos-e az átkelés."
+    },
+    {
+      q: "Mit jelent a piros gyalogos jelzés?",
+      a: ["Át lehet szaladni", "Várakozni kell", "Gyorsabban kell menni"],
+      c: 1,
+      e: "A piros jelzés azt jelenti, hogy meg kell állni és várni."
+    }
+  ],
+  kerékpáros: [
+    {
+      q: "Mi védi leginkább a fejedet kerékpározás közben?",
+      a: ["A baseballsapka", "A kerékpáros sisak", "A kapucni"],
+      c: 1,
+      e: "A megfelelően beállított kerékpáros sisak védi a fejet esés esetén."
+    },
+    {
+      q: "Mit kell tenned kanyarodás előtt?",
+      a: ["Jelezni a szándékodat és körülnézni", "Becsukni a szemed", "Hirtelen elfordulni"],
+      c: 0,
+      e: "A kanyarodási szándékot időben jelezni kell, és meg kell győződni arról, hogy biztonságos a manőver."
+    },
+    {
+      q: "Mit teszel, ha piros a közlekedési lámpa?",
+      a: ["Áthajtok, ha nem jön autó", "Megállok", "Csak lassítok"],
+      c: 1,
+      e: "A piros jelzésnél meg kell állni."
+    }
+  ],
+  rolleres: [
+    {
+      q: "Hol közlekedj a rollereddel?",
+      a: ["Mindig a járókelők között szlalomozva", "A szabályoknak és a helyi közlekedési rendnek megfelelően", "Bárhol, ahol gyorsabb"],
+      c: 1,
+      e: "A rollerrel is figyelni kell a közlekedési szabályokra és a többi közlekedőre."
+    },
+    {
+      q: "Mit teszel, ha sok gyalogos van előtted?",
+      a: ["Lassítok, és biztonságosan kikerülöm őket, ha lehet", "Hangosan rájuk kiáltok", "Gyorsítok"],
+      c: 0,
+      e: "A gyalogosok biztonsága fontos. Lassíts, és csak biztonságosan haladj tovább."
+    },
+    {
+      q: "Miért fontos a megfelelő védőfelszerelés?",
+      a: ["Mert divatos", "Mert csökkentheti a sérülések kockázatát", "Mert gyorsabban lehet vele menni"],
+      c: 1,
+      e: "A megfelelő védőfelszerelés segíthet megelőzni a súlyos sérüléseket."
+    }
+  ]
+};
+
+let mode = "";
+let score = 0;
+let current = 0;
+let list = [];
+
+function startGame(selectedMode) {
+  mode = selectedMode;
+  score = 0;
+  current = 0;
+  list = [...questions[mode]].sort(() => Math.random() - 0.5);
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("end").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+  document.getElementById("modeLabel").textContent = "🚦 " + mode;
+  showQuestion();
+}
+
+function showQuestion() {
+  const item = list[current];
+  document.getElementById("score").textContent = score;
+  document.getElementById("progress").textContent =
+    "Feladat: " + (current + 1) + " / " + list.length;
+  document.getElementById("question").textContent = item.q;
+
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
+
+  item.a.forEach((answer, index) => {
+    const button = document.createElement("button");
+    button.textContent = String.fromCharCode(65 + index) + ") " + answer;
+    button.onclick = () => checkAnswer(index);
+    answers.appendChild(button);
+  });
+
+  document.getElementById("feedback").className = "hidden";
+  document.getElementById("next").classList.add("hidden");
+}
+
+function checkAnswer(index) {
+  const item = list[current];
+  const buttons = document.querySelectorAll("#answers button");
+  buttons.forEach(button => button.disabled = true);
+
+  const feedback = document.getElementById("feedback");
+
+  if (index === item.c) {
+    score += 1;
+    feedback.className = "correct";
+    feedback.innerHTML = "✅ <strong>Helyes válasz!</strong><br>" + item.e;
+  } else {
+    feedback.className = "wrong";
+    feedback.innerHTML = "💡 <strong>Most nem sikerült.</strong><br>" +
+      "A helyes válasz: " + item.a[item.c] + "<br>" + item.e;
+  }
+
+  document.getElementById("score").textContent = score;
+  document.getElementById("next").classList.remove("hidden");
+}
+
+function nextQuestion() {
+  current++;
+  if (current < list.length) {
+    showQuestion();
+  } else {
+    document.getElementById("game").classList.add("hidden");
+    document.getElementById("end").classList.remove("hidden");
+    document.getElementById("result").textContent =
+      "A három feladatból " + score + " helyes válaszod lett. " +
+      (score === 3 ? "Kiváló munka! 🌟" :
+      score === 2 ? "Nagyon ügyes vagy! 👏" :
+      "Gyakorolj még, és egyre ügyesebb leszel! 💚");
+  }
+}
+</script>
+</body>
+</html>
